@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File Encryption/Decryption Tool</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen">
+    <div class="gradient-bg text-white py-8 px-4 shadow-lg">
+        <div class="max-w-4xl mx-auto">
+            <h1 class="text-3xl font-bold text-center mb-2">File Encryption/Decryption Tool</h1>
+            <p class="text-center text-blue-100 mb-6">Secure your files with various cryptographic algorithms</p>
+            
+            <div class="bg-white bg-opacity-10 backdrop-blur-sm rounded-xl p-6 shadow-lg">
+                <div class="flex flex-col md:flex-row gap-6">
+                    <!-- Encryption Section -->
+                    <div class="flex-1 bg-white bg-opacity-10 rounded-lg p-4">
+                        <h2 class="text-xl font-semibold mb-4 flex items-center gap-2">Encrypt Files</h2>
+                        <div class="space-y-4">
+                            <div>
+                                <input type="file" id="encrypt-file" class="hidden" multiple>
+                                <label for="encrypt-file" class="file-input-label block bg-blue-600 hover:bg-blue-700 text-white py-3 px-4 rounded-lg cursor-pointer text-center border-2 border-blue-500 border-opacity-50">
+                                    <div class="flex items-center justify-center gap-2">Select Files to Encrypt</div>
+                                </label>
+                                <div id="encrypt-file-names" class="mt-2 text-sm text-blue-100"></div>
+                            </div>
+                            
+                            <div class="relative">
+                                <label for="encrypt-password" class="block text-sm font-medium text-blue-100 mb-1">Encryption Password</label>
+                                <input type="password" id="encrypt-password" class="w-full px-4 py-2 rounded-lg bg-white bg-opacity-20 border border-blue-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 text-white placeholder-blue-200" placeholder="Enter a strong password">
+                            </div>
+                            
+                            <div class="relative">
+                                <label for="encrypt-algorithm" class="block text-sm font-medium text-blue-100 mb-1">Encryption Algorithm</label>
+                                <select id="encrypt-algorithm" class="w-full px-4 py-2 rounded-lg bg-indigo-900 bg-opacity-80 border border-blue-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-300 text-indigo-100">
+                                    <option value="AES-GCM" class="bg-indigo-700 text-white">AES-GCM (Recommended)</option>
+                                    <option value="AES-CBC">AES-CBC</option>
+                                    <option value="RSA-OAEP">RSA-OAEP</option>
+                                </select>
+                            </div>
+                            
+                            <div>
+                                <button id="encrypt-btn" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white py-2 px-4 rounded-lg flex items-center justify-center gap-2">Encrypt Files</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Decryption Section -->
+                    <div class="flex-1 bg-white bg-opacity-10 rounded-lg p-4">
+                        <h2 class="text-xl font-semibold mb-4 flex items-center gap-2">Decrypt Files</h2>
+                        <div class="space-y-4">
+                            <div>
+                                <input type="file" id="decrypt-file" class="hidden" accept=".enc">
+                                <label for="decrypt-file" class="file-input-label block bg-purple-600 hover:bg-purple-700 text-white py-3 px-4 rounded-lg cursor-pointer text-center border-2 border-purple-500 border-opacity-50">
+                                    <div class="flex items-center justify-center gap-2">Select Encrypted File</div>
+                                </label>
+                                <div id="decrypt-file-name" class="mt-2 text-sm text-blue-100"></div>
+                            </div>
+                            
+                            <div>
+                                <label for="decrypt-password" class="block text-sm font-medium text-blue-100 mb-1">Decryption Password</label>
+                                <input type="password" id="decrypt-password" class="w-full px-4 py-2 rounded-lg bg-white bg-opacity-20 border border-purple-300 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 text-white placeholder-blue-200" placeholder="Enter the encryption password">
+                            </div>
+                            
+                            <div>
+                                <label for="decrypt-algorithm" class="block text-sm font-medium text-blue-100 mb-1">Decryption Algorithm</label>
+                                <select id="decrypt-algorithm" class="w-full px-4 py-2 rounded-lg bg-purple-900 bg-opacity-80 border border-purple-400 focus:border-purple-500 focus:ring-2 focus:ring-purple-300 text-purple-100">
+                                    <option value="AES-GCM">AES-GCM</option>
+                                    <option value="AES-CBC">AES-CBC</option>
+                                    <option value="RSA-OAEP">RSA-OAEP</option>
+                                </select>
+                            </div>
+                            
+                            <div>
+                                <button id="decrypt-btn" class="w-full bg-violet-500 hover:bg-violet-600 text-white py-2 px-4 rounded-lg flex items-center justify-center gap-2">Decrypt File</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="progress-container" class="mt-6 hidden">
+                    <div class="flex justify-between mb-1">
+                        <span class="text-sm font-medium text-blue-100">Processing...</span>
+                        <span id="progress-percent" class="text-sm font-medium text-blue-100">0%</span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-2.5">
+                        <div id="progress-bar" class="bg-blue-500 h-2.5 rounded-full progress-bar" style="width: 0%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="max-w-4xl mx-auto px-4 py-8">
+        <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+            <div class="gradient-bg p-4 flex items-center justify-between">
+                <h2 class="text-xl font-semibold text-white">How It Works</h2>
+                <div class="flex space-x-2">
+                    <button id="security-btn" class="px-3 py-1 bg-white bg-opacity-20 rounded-lg text-white text-sm">Security Info</button>
+                    <button id="help-btn" class="px-3 py-1 bg-white bg-opacity-20 rounded-lg text-white text-sm">Help</button>
+                </div>
+            </div>
+            <div class="p-6">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="bg-blue-50 p-4 rounded-lg">
+                        <div class="text-blue-600 mb-3">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                            </svg>
+                        </div>
+                        <h3 class="font-semibold mb-2">Secure Encryption</h3>
+                        <p class="text-gray-600 text-sm">Files are encrypted using AES-256-GCM, providing military-grade security for your sensitive data.</p>
+                    </div>
+                    <div class="bg-purple-50 p-4 rounded-lg">
+                        <div class="text-purple-600 mb-3">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z" />
+                            </svg>
+                        </div>
+                        <h3 class="font-semibold mb-2">No Server Upload</h3>
+                        <p class="text-gray-600 text-sm">All processing happens in your browser. Your files never leave your device, ensuring complete privacy.</p>
+                    </div>
+                    <div class="bg-green-50 p-4 rounded-lg">
+                        <div class="text-green-600 mb-3">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                            </svg>
+                        </div>
+                        <h3 class="font-semibold mb-2">Password Protected</h3>
+                        <p class="text-gray-600 text-sm">Without the correct password, encrypted files remain completely inaccessible, protecting your data from unauthorized access.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modals -->
+    <div id="security-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+        <div class="bg-white rounded-lg max-w-md w-full mx-4">
+            <div class="gradient-bg p-4 flex justify-between items-center rounded-t-lg">
+                <h3 class="text-lg font-semibold text-white">Security Information</h3>
+                <button id="close-security" class="text-white hover:text-gray-200">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <div class="p-6">
+                <p class="mb-4"><strong>Encryption Details:</strong></p>
+                <ul class="list-disc pl-5 space-y-2 text-sm text-gray-700">
+                    <li>Uses WebCrypto API with multiple algorithms:
+                        <ul class="list-disc pl-5 mt-1 space-y-1">
+                            <li><strong>AES-GCM</strong> - Authenticated 256-bit encryption (Recommended)</li>
+                            <li><strong>AES-CBC</strong> - Standard 256-bit block cipher</li>
+                            <li><strong>RSA-OAEP</strong> - Asymmetric public-key encryption</li>
+                        </ul>
+                    </li>
+                    <li>256-bit encryption key derived from password</li>
+                    <li>Each file has unique random salt and initialization vector</li>
+                    <li>Includes authentication tag to detect tampering</li>
+                </ul>
+                <p class="mt-4 text-sm text-gray-600"><strong>Note:</strong> If you forget your password, there is NO way to recover your files. Choose a strong password and remember it.</p>
+            </div>
+        </div>
+    </div>
+    
+    <div id="help-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+        <div class="bg-white rounded-lg max-w-md w-full mx-4">
+            <div class="gradient-bg p-4 flex justify-between items-center rounded-t-lg">
+                <h3 class="text-lg font-semibold text-white">Help & Instructions</h3>
+                <button id="close-help" class="text-white hover:text-gray-200">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <div class="p-6">
+                <div class="mb-4">
+                    <p class="font-semibold mb-2">Encrypting Files:</p>
+                    <ol class="list-decimal pl-5 space-y-1 text-sm text-gray-700">
+                        <li>Click "Select Files to Encrypt"</li>
+                        <li>Enter a strong password (12+ characters recommended)</li>
+                        <li>Click "Encrypt Files"</li>
+                        <li>Save the encrypted files (.enc extension will be added)</li>
+                    </ol>
+                </div>
+                <div>
+                    <p class="font-semibold mb-2">Decrypting Files:</p>
+                    <ol class="list-decimal pl-5 space-y-1 text-sm text-gray-700">
+                        <li>Click "Select Encrypted File"</li>
+                        <li>Enter the correct password used for encryption</li>
+                        <li>Click "Decrypt File"</li>
+                        <li>Save the decrypted file (original filename will be restored)</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="app.js"></script>
+</body>
+</html>
