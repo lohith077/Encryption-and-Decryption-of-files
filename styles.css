@@ -1,0 +1,25 @@
+.gradient-bg {
+    background: linear-gradient(135deg, #6B73FF 0%, #000DFF 100%);
+}
+
+.file-input-label {
+    transition: all 0.3s ease;
+}
+
+.file-input-label:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(0, 13, 255, 0.2);
+}
+
+.progress-bar {
+    transition: width 0.5s ease-in-out;
+}
+
+.tooltip:hover .tooltip-text {
+    visibility: visible;
+    opacity: 1;
+}
+
+#password-strength {
+    transition: width 0.3s ease;
+}
